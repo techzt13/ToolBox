@@ -22,7 +22,8 @@ const routes = [
   { path: '/tools/css-box-shadow', component: () => import('../views/tools/CssBoxShadow.vue') },
   { path: '/tools/lorem-ipsum', component: () => import('../views/tools/LoremIpsum.vue') },
   { path: '/tools/url-encoder', component: () => import('../views/tools/UrlEncoder.vue') },
-  { path: '/tools/image-to-base64', component: () => import('../views/tools/ImageToBase64.vue') }
+  { path: '/tools/image-to-base64', component: () => import('../views/tools/ImageToBase64.vue') },
+  { path: '/tools/currency-converter', component: () => import('../views/tools/CurrencyConverter.vue') }
 ]
 
 const router = createRouter({

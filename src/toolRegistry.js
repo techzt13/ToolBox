@@ -178,5 +178,14 @@ export const tools = [
     icon: '🖼️',
     route: '/tools/image-to-base64',
     keywords: ['image','base64','convert','encode']
+  },
+  {
+    id: 'currency-converter',
+    name: 'Currency Converter',
+    description: 'Convert between world currencies using live exchange rates',
+    category: 'Convert',
+    icon: '💱',
+    route: '/tools/currency-converter',
+    keywords: ['currency','exchange','money','rate','forex','convert','dollar','euro','pound']
   }
 ]
