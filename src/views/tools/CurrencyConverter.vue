@@ -66,6 +66,52 @@ const copied = ref(false)
 
 const currencyList = ref([])
 
+const CURRENCY_NAMES = {
+  USD: 'US Dollar',
+  EUR: 'Euro',
+  GBP: 'British Pound',
+  JPY: 'Japanese Yen',
+  AUD: 'Australian Dollar',
+  CAD: 'Canadian Dollar',
+  CHF: 'Swiss Franc',
+  CNY: 'Chinese Yuan',
+  HKD: 'Hong Kong Dollar',
+  NZD: 'New Zealand Dollar',
+  SEK: 'Swedish Krona',
+  KRW: 'South Korean Won',
+  SGD: 'Singapore Dollar',
+  NOK: 'Norwegian Krone',
+  MXN: 'Mexican Peso',
+  INR: 'Indian Rupee',
+  RUB: 'Russian Ruble',
+  ZAR: 'South African Rand',
+  TRY: 'Turkish Lira',
+  BRL: 'Brazilian Real',
+  TWD: 'New Taiwan Dollar',
+  DKK: 'Danish Krone',
+  PLN: 'Polish Zloty',
+  THB: 'Thai Baht',
+  IDR: 'Indonesian Rupiah',
+  HUF: 'Hungarian Forint',
+  CZK: 'Czech Koruna',
+  ILS: 'Israeli New Shekel',
+  CLP: 'Chilean Peso',
+  PHP: 'Philippine Peso',
+  AED: 'UAE Dirham',
+  COP: 'Colombian Peso',
+  SAR: 'Saudi Riyal',
+  MYR: 'Malaysian Ringgit',
+  RON: 'Romanian Leu',
+  PKR: 'Pakistani Rupee',
+  EGP: 'Egyptian Pound',
+  NGN: 'Nigerian Naira',
+  BDT: 'Bangladeshi Taka',
+  VND: 'Vietnamese Dong',
+}
+
+const API_KEY = '58a4fbf2f8486544f404f99a'
+const API_BASE = `https://v6.exchangerate-api.com/v6/${API_KEY}`
+
 function formatNumber(n) {
   if (n === null || n === undefined) return ''
   const num = parseFloat(n)
@@ -77,11 +123,13 @@ async function fetchCurrencies() {
   loading.value = true
   fetchError.value = ''
   try {
-    const res = await fetch('https://api.frankfurter.dev/v2/currencies')
+    const res = await fetch(`${API_BASE}/latest/USD`)
     if (!res.ok) throw new Error('Failed to fetch currencies')
     const data = await res.json()
-    currencyList.value = Object.entries(data).map(([code, name]) => ({ code, name }))
-    currencies.value = Object.keys(data)
+    if (data.result !== 'success') throw new Error('Failed to fetch currencies')
+    const codes = Object.keys(data.conversion_rates)
+    currencyList.value = codes.map(code => ({ code, name: CURRENCY_NAMES[code] || code }))
+    currencies.value = codes
   } catch (e) {
     fetchError.value = 'Could not load currencies. Please check your connection and try again.'
   } finally {
@@ -115,15 +163,15 @@ async function convert() {
 
   converting.value = true
   try {
-    const url = `https://api.frankfurter.dev/v2/rates?base=${fromCurrency.value}&quotes=${toCurrency.value}`
-    const res = await fetch(url)
+    const res = await fetch(`${API_BASE}/latest/${fromCurrency.value}`)
     if (!res.ok) throw new Error('Conversion failed')
     const data = await res.json()
-    const fetchedRate = data.rates && data.rates[toCurrency.value]
+    if (data.result !== 'success') throw new Error('Conversion failed')
+    const fetchedRate = data.conversion_rates && data.conversion_rates[toCurrency.value]
     if (!fetchedRate) throw new Error('Rate not found')
     rate.value = fetchedRate
     result.value = rate.value * val
-    rateDate.value = data.date
+    rateDate.value = data.time_last_update_utc
   } catch (e) {
     error.value = 'Could not convert. Please check your connection and try again.'
   } finally {
