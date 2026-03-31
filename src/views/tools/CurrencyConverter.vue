@@ -77,7 +77,7 @@ async function fetchCurrencies() {
   loading.value = true
   fetchError.value = ''
   try {
-    const res = await fetch('https://api.frankfurter.dev/currencies')
+    const res = await fetch('https://api.frankfurter.dev/v2/currencies')
     if (!res.ok) throw new Error('Failed to fetch currencies')
     const data = await res.json()
     currencyList.value = Object.entries(data).map(([code, name]) => ({ code, name }))
@@ -115,21 +115,15 @@ async function convert() {
 
   converting.value = true
   try {
-    const url = `https://api.frankfurter.dev/latest?amount=${val}&from=${fromCurrency.value}&to=${toCurrency.value}`
+    const url = `https://api.frankfurter.dev/v2/rates?base=${fromCurrency.value}&quotes=${toCurrency.value}`
     const res = await fetch(url)
     if (!res.ok) throw new Error('Conversion failed')
     const data = await res.json()
-    result.value = data.rates[toCurrency.value]
+    const fetchedRate = data.rates && data.rates[toCurrency.value]
+    if (!fetchedRate) throw new Error('Rate not found')
+    rate.value = fetchedRate
+    result.value = rate.value * val
     rateDate.value = data.date
-
-    const rateUrl = `https://api.frankfurter.dev/latest?from=${fromCurrency.value}&to=${toCurrency.value}`
-    const rateRes = await fetch(rateUrl)
-    if (rateRes.ok) {
-      const rateData = await rateRes.json()
-      rate.value = rateData.rates[toCurrency.value]
-    } else {
-      rate.value = result.value / val
-    }
   } catch (e) {
     error.value = 'Could not convert. Please check your connection and try again.'
   } finally {
