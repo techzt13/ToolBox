@@ -1,17 +1,12 @@
 <template>
   <div class="home">
-    <div class="home-hero">
-      <h1 class="hero-title">🧰 ToolBox</h1>
-      <p class="hero-sub">Your online Swiss Army Knife — 20 free productivity tools</p>
-      <SearchBar v-model="query" />
-    </div>
     <div class="home-body">
       <div class="cat-tabs">
         <button
           v-for="cat in categories"
           :key="cat"
           :class="['cat-tab', { active: activeCategory === cat }]"
-          @click="activeCategory = cat"
+          @click="setCategory(cat)"
         >{{ cat }}</button>
       </div>
       <div class="grid" v-if="filtered.length">
@@ -33,19 +28,21 @@
 </template>
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import SearchBar from '../components/SearchBar.vue'
 import ToolCard from '../components/ToolCard.vue'
 import { tools } from '../toolRegistry'
+import { searchQuery, activeCategory } from '../state'
 
-const query = ref('')
-const activeCategory = ref('All')
 const favs = ref([])
-const categories = ['All', 'Favourites', 'Convert', 'Text', 'Developer', 'Design', 'Utility']
+const categories = ['All', 'Convert', 'Text', 'Developer', 'Design', 'Utility']
 
 onMounted(() => {
   const saved = localStorage.getItem('favs')
   if (saved) favs.value = JSON.parse(saved)
 })
+
+function setCategory(cat) {
+  activeCategory.value = cat
+}
 
 function toggleFav(id) {
   const idx = favs.value.indexOf(id)
@@ -61,8 +58,8 @@ const filtered = computed(() => {
   } else if (activeCategory.value !== 'All') {
     list = list.filter(t => t.category === activeCategory.value)
   }
-  if (query.value.trim()) {
-    const q = query.value.toLowerCase()
+  if (searchQuery.value.trim()) {
+    const q = searchQuery.value.toLowerCase()
     list = list.filter(t =>
       t.name.toLowerCase().includes(q) ||
       t.description.toLowerCase().includes(q) ||
@@ -74,54 +71,47 @@ const filtered = computed(() => {
 </script>
 <style scoped>
 .home { min-height: 100vh; }
-.home-hero {
-  background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
-  padding: 60px 24px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-}
-.hero-title { font-size: 48px; font-weight: 900; color: #fff; letter-spacing: -1px; }
-.hero-sub { font-size: 18px; color: rgba(255,255,255,0.85); margin-bottom: 8px; }
-.home-body { max-width: 1400px; margin: 0 auto; padding: 32px 24px; }
+.home-body { max-width: 1140px; margin: 0 auto; padding: 16px 20px 40px; }
 .cat-tabs {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 .cat-tab {
-  padding: 8px 18px;
-  border-radius: 20px;
+  padding: 7px 18px;
+  border-radius: 999px;
   border: 1.5px solid var(--border);
-  background: var(--bg-card);
-  color: var(--text-muted);
+  background: var(--surface);
+  color: var(--muted);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 }
-.cat-tab.active, .cat-tab:hover {
+.cat-tab:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.cat-tab.active {
   background: var(--primary);
   color: #fff;
   border-color: var(--primary);
 }
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
 }
 .no-results {
   text-align: center;
   padding: 80px 20px;
-  color: var(--text-muted);
+  color: var(--muted);
 }
 .no-results-icon { font-size: 48px; margin-bottom: 16px; }
 .no-results-sub { font-size: 14px; margin-top: 8px; }
 @media (max-width: 600px) {
-  .hero-title { font-size: 32px; }
   .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
 }
 </style>
+
