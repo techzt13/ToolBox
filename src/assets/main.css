@@ -23,6 +23,7 @@
 }
 
 [data-theme="dark"] {
+  color: var(--text);
   --primary: #60a5fa;
   --primary-2: #3b82f6;
   --primary-hover: #3b82f6;
@@ -42,6 +43,7 @@
 }
 
 [data-theme="light"] {
+  color: var(--text);
   background-color: #f6f7fb;
   background-image:
     radial-gradient(1200px 600px at 30% -10%, rgba(37,99,235,0.10), transparent 50%),
@@ -50,6 +52,7 @@
 }
 
 [data-theme="dark"] {
+  color: var(--text);
   background-color: #0b1220;
   min-height: 100vh;
 }
