@@ -130,7 +130,7 @@ input:focus, select:focus, textarea:focus {
   transition: all 0.2s;
 }
 .back-btn:hover { border-color: var(--primary); color: var(--primary); }
-.tool-title { font-size: 26px; font-weight: 700; }
+.tool-title { font-size: 26px; font-weight: 700; color: var(--text); }
 .tool-card {
   background: var(--bg-card);
   border-radius: var(--radius);
